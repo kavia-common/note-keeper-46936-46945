@@ -6,6 +6,71 @@ import NoteListItem from '../components/NoteListItem';
 import { store } from '../state/store';
 
 /**
+ * Global keyboard shortcut handler
+ * - Ctrl/Cmd+N: Add new note and select it
+ * - Ctrl/Cmd+S: Save/update current note (no-op if nothing changed)
+ * - Delete: Delete currently selected note
+ * - Up/Down: Navigate the sidebar list
+ */
+function installGlobalShortcuts(ctx) {
+  if (typeof window === 'undefined') return () => {};
+  const handler = async (e) => {
+    const key = e.key;
+    const ctrl = e.ctrlKey || e.metaKey;
+
+    // if focus is inside a text input area (HTML/native), do not hijack
+    const ae = document.activeElement;
+    const isTyping =
+      ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.isContentEditable);
+
+    // Ctrl/Cmd + N: Add note
+    if (ctrl && (key === 'n' || key === 'N')) {
+      e.preventDefault();
+      if (store.addNote) {
+        const created = await store.addNote({ title: 'Untitled', content: '' });
+        if (created?.id) store.selectNote(created.id);
+      }
+      return;
+    }
+
+    // Ctrl/Cmd + S: Save note
+    if (ctrl && (key === 's' || key === 'S')) {
+      e.preventDefault();
+      const note = store.selectedNote ? store.selectedNote() : null;
+      if (note && store.updateNote) {
+        // In this minimal implementation we assume editor updates store live,
+        // so save acts as "touch update" to refresh updatedAt.
+        await store.updateNote(note.id, { title: note.title, content: note.content });
+      }
+      return;
+    }
+
+    // Delete: Delete selected note (avoid if actively typing in an input area)
+    if (!ctrl && key === 'Delete' && !isTyping) {
+      const current = store.selectedNote ? store.selectedNote() : null;
+      if (current && store.deleteNote) {
+        // eslint-disable-next-line no-restricted-globals
+        const ok = window.confirm('Delete the selected note? This cannot be undone.');
+        if (ok) await store.deleteNote(current.id);
+      }
+      return;
+    }
+
+    // Up/Down: route to Sidebar for list navigation
+    if (!isTyping && (key === 'ArrowUp' || key === 'ArrowDown')) {
+      const sidebar = ctx.tag && ctx.tag('Body.SidebarHolder');
+      if (sidebar && typeof sidebar._handleKey === 'function') {
+        // Fake an event payload to reuse handlers in Sidebar
+        sidebar._handleKey({ key });
+        e.preventDefault();
+      }
+    }
+  };
+  window.addEventListener('keydown', handler, { passive: false });
+  return () => window.removeEventListener('keydown', handler);
+}
+
+/**
  * PUBLIC_INTERFACE
  * NotesLayout
  * Application shell: header, sidebar with notes list, and main content area.
@@ -194,6 +259,9 @@ export default class NotesLayout extends Component {
     ];
 
     this._setLoading(true);
+
+    // Install global keyboard shortcuts
+    this._uninstallShortcuts = installGlobalShortcuts(this);
   }
 
   async ready() {
@@ -210,6 +278,10 @@ export default class NotesLayout extends Component {
     if (this._unsubscribe) {
       this._unsubscribe();
       this._unsubscribe = null;
+    }
+    if (this._uninstallShortcuts) {
+      this._uninstallShortcuts();
+      this._uninstallShortcuts = null;
     }
   }
 

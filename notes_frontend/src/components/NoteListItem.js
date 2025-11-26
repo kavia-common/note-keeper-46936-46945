@@ -40,6 +40,7 @@ export default class NoteListItem extends lng.Component {
         rect: true,
         color: 0x00ffffff, // transparent by default
         shader: { type: lng.shaders.RoundedRectangle, radius: 8 },
+        alpha: 1,
       },
       Content: {
         x: 12,
@@ -158,11 +159,13 @@ export default class NoteListItem extends lng.Component {
 
   _focus() {
     this.tag('FocusRing').alpha = 1;
+    this.patch({ smooth: { scale: 1.02, duration: 0.18 } });
     this._updateHover(true);
   }
 
   _unfocus() {
     this.tag('FocusRing').alpha = 0;
+    this.patch({ smooth: { scale: 1.0, duration: 0.18 } });
     this._updateHover(false);
   }
 
@@ -209,7 +212,9 @@ export default class NoteListItem extends lng.Component {
       activeBg: 0x0f2563eb,
     };
     // Use background overlay intensity to indicate active
-    this.tag('Overlay').color = this._active ? ocean.activeBg : 0x00ffffff;
+    const overlay = this.tag('Overlay');
+    overlay.setSmooth('color', this._active ? ocean.activeBg : 0x00ffffff, { duration: 0.18 });
+
     // Title emphasis when active
     const title = this.tag('Content').tag('Title').text;
     title.fontStyle = this._active ? 'bold' : 'normal';
@@ -220,7 +225,7 @@ export default class NoteListItem extends lng.Component {
     this._hover = isHovering;
     if (this._active) return; // active state wins
     // subtle hover overlay
-    this.tag('Overlay').color = isHovering ? 0x142563eb : 0x00ffffff;
+    this.tag('Overlay').setSmooth('color', isHovering ? 0x142563eb : 0x00ffffff, { duration: 0.16 });
   }
 
   // Mouse interactions to support hover and click

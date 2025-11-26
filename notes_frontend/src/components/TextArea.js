@@ -173,10 +173,12 @@ export default class TextArea extends lng.Component {
   }
 
   _focus() {
+    this.setSmooth('scale', 1.01, { duration: 0.12 });
     this._applyProps();
   }
 
   _unfocus() {
+    this.setSmooth('scale', 1.0, { duration: 0.12 });
     this._applyProps();
   }
 

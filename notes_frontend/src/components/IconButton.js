@@ -187,24 +187,28 @@ export default class IconButton extends lng.Component {
   _handleMouseEnter() {
     if (this._props.disabled) return;
     this._hovered = true;
+    this.setSmooth('scale', 1.03, { duration: 0.12 });
     this._applyProps();
   }
 
   _handleMouseLeave() {
     this._hovered = false;
     this._pressed = false;
+    this.setSmooth('scale', 1.0, { duration: 0.12 });
     this._applyProps();
   }
 
   _handleMouseDown() {
     if (this._props.disabled) return;
     this._pressed = true;
+    this.setSmooth('scale', 0.98, { duration: 0.08 });
     this._applyProps();
   }
 
   _handleMouseUp() {
     if (this._props.disabled) return;
     this._pressed = false;
+    this.setSmooth('scale', this._hovered ? 1.03 : 1.0, { duration: 0.1 });
     this._applyProps();
   }
 }
