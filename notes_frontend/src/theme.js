@@ -189,6 +189,44 @@ export const theme = {
     focusRing,
     withSurfaceStyle,
   },
+
+  // Extended tokens required by NotesLayout and other components
+  get backgroundColor() {
+    return colors.background;
+  },
+  get surface() {
+    return colors.surface;
+  },
+  get surfaceMuted() {
+    return '#dbeafe'; // subtle blue-tinted shade (blue-100)
+  },
+  get surfaceBorder() {
+    return '#e5e7eb'; // gray-200 for separators/borders
+  },
+  get textPrimary() {
+    return colors.text;
+  },
+  get textSecondary() {
+    return '#4b5563'; // gray-600
+  },
+  get primary() {
+    return colors.primary;
+  },
+  get secondary() {
+    return colors.secondary;
+  },
+  get success() {
+    return colors.success;
+  },
+  get error() {
+    return colors.error;
+  },
+  get errorSurface() {
+    return '#fee2e2'; // red-100
+  },
+  get errorText() {
+    return '#991b1b'; // red-800
+  },
 };
 
 export default theme;
