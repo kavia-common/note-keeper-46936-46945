@@ -82,7 +82,7 @@ async function apiFetch(path, options = {}) {
   // try json, fallback to empty
   try {
     return await resp.json();
-  } catch (_) {
+  } catch {
     return null;
   }
 }
