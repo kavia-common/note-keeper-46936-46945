@@ -1,7 +1,7 @@
 import lng from '@lightningjs/core';
-import store from '../state/store';
-import theme from '../theme';
-import EmptyState from '../components/EmptyState';
+import { store } from '../state/store.js';
+import theme from '../theme.js';
+import EmptyState from '../components/EmptyState.js';
 
 /**
  * NotesIndex page

@@ -1,16 +1,14 @@
-import Blits from '@lightningjs/blits'
-
-// Theme (keep store import ready but avoid unused var for now)
-import theme from './theme.js'
-// import { store } from './state/store.js'
-
+import Blits, { Component } from '@lightningjs/blits'
+import theme, { theme as themeNamed } from './theme.js'
 import NotesLayout from './pages/NotesLayout.js'
 
+/**
+ * PUBLIC_INTERFACE
+ * Root Application for Notes
+ * - Sets background and mounts NotesLayout at root route.
+ * - Avoids complex JavaScript inside template to keep Blits precompiler happy.
+ */
 export default Blits.Application({
-  /**
-   * Root template sets a themed background and shows the current route.
-   * Keep bindings simple for the Blits precompiler.
-   */
   template: `
     <Element w="1920" h="1080" :color="$bgColor">
       <RouterView />
@@ -18,20 +16,19 @@ export default Blits.Application({
   `,
   state() {
     return {
-      bgColor: theme.colors.background,
+      bgColor: 0xffffffff, // replaced in ready() using CSS for gradient background
     }
   },
   hooks: {
     ready() {
-      // Set page background to a subtle gradient aligned with Ocean theme when DOM exists.
       if (typeof document !== 'undefined' && document.body) {
         document.body.style.margin = '0'
-        document.body.style.background = theme.gradient()
-        document.body.style.color = theme.colors.text
+        document.body.style.background = (themeNamed?.gradient?.() || theme.gradient())
+        document.body.style.color = (themeNamed?.colors?.text || theme.colors?.text || '#111827')
       }
-      // Optional store bootstrap when NotesLayout lands:
-      // store.loadNotes().catch(() => {})
     },
   },
-  routes: [{ path: '/', component: NotesLayout }],
+  routes: [
+    { path: '/', component: NotesLayout },
+  ],
 })

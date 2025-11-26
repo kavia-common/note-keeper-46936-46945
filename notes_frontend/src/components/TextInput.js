@@ -1,5 +1,5 @@
 import lng from '@lightningjs/core';
-import { theme } from '../theme';
+import { theme } from '../theme.js';
 
 /**
  * PUBLIC_INTERFACE

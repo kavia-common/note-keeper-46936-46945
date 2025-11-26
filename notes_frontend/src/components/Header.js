@@ -1,6 +1,7 @@
-import { Component } from 'blits';
-import { store } from '../state/store';
-import theme from '../theme';
+import Blits from '@lightningjs/blits';
+const { Component } = Blits;
+import { store } from '../state/store.js';
+import theme from '../theme.js';
 
 /**
  * Header component for the Notes app.

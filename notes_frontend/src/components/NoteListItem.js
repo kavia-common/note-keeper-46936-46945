@@ -1,6 +1,6 @@
 import lng from '@lightningjs/core';
-import { theme } from '../theme';
-import { store } from '../state/store';
+import { theme } from '../theme.js';
+import { store } from '../state/store.js';
 
 /**
  * PUBLIC_INTERFACE

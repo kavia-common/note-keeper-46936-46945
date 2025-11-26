@@ -1,7 +1,7 @@
 import lng from '@lightningjs/core';
 import NoteListItem from './NoteListItem';
-import { theme } from '../theme';
-import { store } from '../state/store';
+import { theme } from '../theme.js';
+import { store } from '../state/store.js';
 
 /**
  * PUBLIC_INTERFACE
@@ -88,16 +88,15 @@ export default class Sidebar extends lng.Component {
   _init() {
     // Subscribe to store
     this._unsubscribe = store.subscribe(() => {
-      const state = store.getState();
-      // Expecting state.sortedNotes and state.selectedNoteId
-      const sortedNotes = state.sortedNotes || [];
-      const selectedId = state.selectedNoteId || null;
-      this._applyData(sortedNotes, selectedId);
+      const notes = typeof store.sortedNotes === 'function' ? store.sortedNotes() : (store.getState()?.notes || []);
+      const selectedId = store.getState()?.selectedNoteId ?? null;
+      this._applyData(notes, selectedId);
     });
 
     // Initial state
-    const state = store.getState();
-    this._applyData(state.sortedNotes || [], state.selectedNoteId || null);
+    const notes = typeof store.sortedNotes === 'function' ? store.sortedNotes() : (store.getState()?.notes || []);
+    const selectedId = store.getState()?.selectedNoteId ?? null;
+    this._applyData(notes, selectedId);
 
     // enable wheel/mouse scrolling
     this._enableMouse();
@@ -139,11 +138,10 @@ export default class Sidebar extends lng.Component {
           // not used here
         },
         onSelectHandler: (noteId) => {
-          store.dispatch({ type: 'selectNote', payload: noteId });
+          if (store.selectNote) store.selectNote(noteId);
         },
-        onDeleteHandler: (noteId) => {
-          // Simple confirm is inside NoteListItem by default; keep here to ensure dispatch
-          store.dispatch({ type: 'deleteNote', payload: noteId });
+        onDeleteHandler: async (noteId) => {
+          if (store.deleteNote) await store.deleteNote(noteId);
         },
       });
     });
@@ -233,7 +231,7 @@ export default class Sidebar extends lng.Component {
   _handleEnter() {
     const item = this._getFocused();
     if (item && item.noteId != null) {
-      store.dispatch({ type: 'selectNote', payload: item.noteId });
+      if (store.selectNote) store.selectNote(item.noteId);
       return true;
     }
     return false;

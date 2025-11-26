@@ -176,6 +176,8 @@ export function withSurfaceStyle({
   return base;
 }
 
+/* Keep a named and default export for theme to support both import styles */
+
 // PUBLIC_INTERFACE
 export const theme = {
   name: 'Ocean Professional',

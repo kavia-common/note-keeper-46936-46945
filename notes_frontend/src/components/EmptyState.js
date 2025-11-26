@@ -1,11 +1,11 @@
 import lng from '@lightningjs/core';
-import theme from '../theme';
-import store from '../state/store';
+import theme from '../theme.js';
+import { store } from '../state/store.js';
 
 /**
  * EmptyState component
  * Renders an ocean-themed friendly prompt encouraging user to add the first note.
- * Provides a button that dispatches addNote and selects it.
+ * Provides a button that creates a note via store.addNote and selects it.
  */
 export default class EmptyState extends lng.Component {
   static _template() {
@@ -91,8 +91,7 @@ export default class EmptyState extends lng.Component {
   }
 
   _init() {
-    // Ensure we have access to actions from store if exposed
-    // Fallback to dispatching by type if actions object is not provided.
+    // optional external actions, but prefer store's native methods
     this._actions = store.actions || {};
   }
 
@@ -131,30 +130,25 @@ export default class EmptyState extends lng.Component {
   }
 
   _createNote() {
-    const state = store.getState ? store.getState() : {};
-    const hasAdd = this._actions.addNote || null;
-
-    let newNoteId;
-
-    if (hasAdd) {
-      const result = this._actions.addNote();
-      // If action returns created id
-      newNoteId = result && result.id ? result.id : undefined;
-    } else if (store.dispatch) {
-      // Generic dispatch fallback
-      const action = { type: 'notes/addNote' };
-      const res = store.dispatch(action);
-      newNoteId = res && res.id ? res.id : undefined;
-    }
-
-    // Select the note
-    const selectAction =
-      (this._actions.selectNote && this._actions.selectNote(newNoteId)) ||
-      (store.dispatch && store.dispatch({ type: 'notes/selectNote', payload: newNoteId }));
-
-    if (this._onCreate) {
-      this._onCreate(newNoteId);
-    }
+    const run = async () => {
+      try {
+        const add = this._actions.addNote || store.addNote?.bind(store);
+        const select = this._actions.selectNote || store.selectNote?.bind(store);
+        if (!add) return;
+        const created = await add({ title: 'Untitled', content: '' });
+        const newNoteId = created?.id;
+        if (newNoteId != null && typeof select === 'function') {
+          select(newNoteId);
+        }
+        if (this._onCreate) {
+          this._onCreate(newNoteId);
+        }
+      } catch (e) {
+        // ignore and stay on empty state
+        // console.warn('Failed to create note from EmptyState:', e)
+      }
+    };
+    run();
   }
 
   // PUBLIC_INTERFACE
