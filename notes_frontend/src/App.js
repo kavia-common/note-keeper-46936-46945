@@ -4,8 +4,7 @@ import Blits from '@lightningjs/blits'
 import theme from './theme.js'
 // import { store } from './state/store.js'
 
-// import NotesLayout from './pages/NotesLayout.js'
-import Home from './pages/Home.js'
+import NotesLayout from './pages/NotesLayout.js'
 
 export default Blits.Application({
   /**
@@ -34,6 +33,5 @@ export default Blits.Application({
       // store.loadNotes().catch(() => {})
     },
   },
-  // routes: [{ path: '/', component: NotesLayout }],
-  routes: [{ path: '/', component: Home }],
+  routes: [{ path: '/', component: NotesLayout }],
 })

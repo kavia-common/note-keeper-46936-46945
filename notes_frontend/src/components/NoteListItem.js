@@ -1,4 +1,4 @@
-import lng from '@lightningjs/lng';
+import lng from '@lightningjs/core';
 import { theme } from '../theme';
 import { store } from '../state/store';
 

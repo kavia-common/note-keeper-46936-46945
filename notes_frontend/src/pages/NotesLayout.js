@@ -1,4 +1,5 @@
-import { Component, Lightning } from '@lightningjs/blits';
+import Blits from '@lightningjs/blits';
+const { Component, Lightning } = Blits;
 import { theme } from '../theme';
 import Loader from '../components/Loader';
 import Sidebar from '../components/Sidebar';
